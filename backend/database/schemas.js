@@ -6,9 +6,17 @@ const userSchema = new Schema({
 	username: String,
 	hashedPwd: String,
 	publicKey: String,
+	pollsCreated: [{
+		pollID:
+		{
+			type: Schema.Types.ObjectId,
+			ref: 'Elections'
+		},
+		smartContractAddress: String
+	}],
 	elections: [
 		{
-			pollID: { type: Schema.Types.ObjectId, ref: 'Elections', },
+			pollID: { type: Schema.Types.ObjectId, ref: 'Elections' },
 			encryptedVote://encryted with public key of client 
 			{
 				type: String,
@@ -18,21 +26,24 @@ const userSchema = new Schema({
 			{
 				type: String,
 				default: ""
+			},
+			hashedUID://encryted with public key of client 
+			{
+				type: String,
+				default: ""
 			}
 		}
 	]
 });
 
 const electionSchema = new Schema({
-	pollID: Schema.Types.ObjectId,
 	smartContractAddress: String,
 	hostVoterID: String,
 	hostPublicKey: String,
 	candidates: [{ type: String }],
-	votersUIDhashed: [{ type: String }]
 })
 
 module.exports = {
-	USER: mongoose.model('Users', userSchema),
-	ELECTION: mongoose.model('Elections', electionSchema)
+	userModel: mongoose.model('Users', userSchema),
+	electionModel: mongoose.model('Elections', electionSchema)
 };

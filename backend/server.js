@@ -2,16 +2,15 @@
 if (process.env.NODE_ENV !== "production") {
 	require("dotenv").config();
 }
-const winston = require('winston');
 const path = require("path");
 const express = require("express");
 const cookieParser = require("cookie-parser");
 const cors = require("cors");
 const connectMongo = require("./database/connectMongoDb");
 const auth = require("./routes/auth")
-const api = require("./routes/api")
+const api = 
 require('./database/schemas')
-
+const winston = require('winston');
 const logger = winston.createLogger({
 	transports: [
 		new winston.transports.Console(),
@@ -24,7 +23,7 @@ try {
 
 	//Middlewares
 	app.use(cookieParser(process.env.COOKIE_SECRET));
-	app.use(cors({ origin: true, credentials: true }));
+	app.use(cors({ origin: [process.env.FRONTEND_BASEURL], credentials: true }));
 	app.use(express.json());
 	app.use(express.urlencoded({ extended: true }));
 
@@ -42,7 +41,7 @@ try {
 
 	//api endpoints
 	app.use('/auth', auth)
-	app.use('/api', api)
+	app.use('/api/v1', require('./routes/authorization').checkauthorization, require("./routes/api/v1/index"))
 
 	//serve static assets when in production
 	if (process.env.NODE_ENV === "production") {
