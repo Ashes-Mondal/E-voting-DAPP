@@ -4,30 +4,47 @@ pragma solidity ^0.8.9;
 import "./Ownable.sol";
 
 contract Ballot is Ownable {
-	string[] encryptedVotes;
-	mapping(string => bool) voters;
-	bool public votingPhase = true;
+    string[] encryptedVotes;
+    mapping(string => bool) voters;
+    mapping(string => string) votes;
+    bool public votingPhase = true;
 
     constructor() Ownable(msg.sender) {}
 
-	function checkVoteStatus (string memory _UUID) external view returns (bool){
-		return voters[_UUID];
-	}
+    function checkVoteStatus(string memory _UUID) external view returns (bool) {
+        return voters[_UUID];
+    }
 
-	function getAllEncryptedVotes() onlyOwner external view returns (string[] memory){
-		require(votingPhase == false,"Voting Phase Still going!");
-		return encryptedVotes;
-	}
+    function getAllEncryptedVotes()
+        external
+        view
+        onlyOwner
+        returns (string[] memory)
+    {
+        require(votingPhase == false, "Voting Phase Still going!");
+        return encryptedVotes;
+    }
 
-	function addVote(string memory _UUID,string memory _encryptedVote) external{
-		require(votingPhase == true,"Voting Phase closed!");
-		if(voters[_UUID] == false){
-			encryptedVotes.push(_encryptedVote);
-			voters[_UUID] = true;
-		}
-	}
+    function getEncryptedVote(
+        string memory _UUID
+    ) external view returns (string memory) {
+		require(voters[_UUID] == true, "Not voted!");
+        return votes[_UUID];
+    }
 
-	function closeVotingPhase () onlyOwner public {
-		votingPhase = false;
-	}
+    function addVote(
+        string memory _UUID,
+        string memory _encryptedVote
+    ) external {
+        require(votingPhase == true, "Voting Phase closed!");
+        if (voters[_UUID] == false) {
+            encryptedVotes.push(_encryptedVote);
+            voters[_UUID] = true;
+            votes[_UUID] = _encryptedVote;
+        }
+    }
+
+    function closeVotingPhase() public onlyOwner {
+        votingPhase = false;
+    }
 }

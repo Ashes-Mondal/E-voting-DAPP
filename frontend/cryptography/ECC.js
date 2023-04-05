@@ -36,7 +36,7 @@ export const genECCkeyPair = () => {
 export const encryptVote = async (voteUTF8, publicKeyHEX) => {
 	//Vote: utf8, publicKey:hex returns HEX
 	const publicKeyBuffer = eccryptoJS.hexToBuffer(publicKeyHEX);
-	const voteBuffer = eccryptoJS.utf8ToBuffer(voteUTF8);
+	const voteBuffer = eccryptoJS.utf8ToBuffer(voteUTF8.toLowerCase());
 
 	const encrypted = await eccryptoJS.encrypt(publicKeyBuffer, voteBuffer);
 	return stringifyEncryptedObject(encrypted);
@@ -47,4 +47,8 @@ export const decryptVote = async (encryptedVoteStringified, privateKeyHEX) => {
 	const encryptedVoteObject= convertBackToEncryptedObject(encryptedVoteStringified)
 	const decryptedBuffer = await eccryptoJS.decrypt(privateKeyBuffer, encryptedVoteObject);
 	return decryptedBuffer.toString();
+}
+
+export const verifyVote = async(voteUTF8,publicKeyHEX,encVoteStr)=>{
+	return encVoteStr === encryptVote(voteUTF8,publicKeyHEX);
 }

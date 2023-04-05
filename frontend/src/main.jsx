@@ -2,12 +2,12 @@ import React from 'react'
 import ReactDOM from 'react-dom/client'
 import App from './App'
 import './index.css'
-import {EthereumProvider} from '../context/Ethereum'
+import { EthereumProvider } from '../context/Ethereum'
 
 ReactDOM.createRoot(document.getElementById('root')).render(
-  <EthereumProvider>
-    <React.StrictMode>
+  <React.StrictMode>
+    <EthereumProvider>
       <App />
-    </React.StrictMode>,
-  </EthereumProvider>
+    </EthereumProvider>
+  </React.StrictMode>,
 )

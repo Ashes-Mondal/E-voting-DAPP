@@ -1,8 +1,10 @@
 import { abi, bytecode } from '../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json'
 import { ethers, ContractFactory } from "ethers";
 import React, { useEffect, useState } from "react";
+import { useCallback } from 'react';
+import { verifyVote } from '../cryptography/ECC';
 
-export const EthereumContext = React.createContext(); 
+export const EthereumContext = React.createContext();
 const { ethereum } = window;
 
 const deployBallotContract = async () => {
@@ -24,8 +26,7 @@ const getBallotContract = (addr) => {
 export const EthereumProvider = ({ children }) => {
 	const [currentAccount, setCurrentAccount] = useState("");
 
-
-	const checkIfWalletIsConnect = async () => {
+	const checkIfWalletIsConnect = useCallback(async () => {
 		try {
 			if (!ethereum) return alert("Please install MetaMask.");
 			const accounts = await ethereum.request({ method: "eth_accounts" });
@@ -37,10 +38,10 @@ export const EthereumProvider = ({ children }) => {
 		} catch (error) {
 			console.error(error);
 		}
-	};
+	}, [])
 
 	//! CONNECT TO METAMASK WALLET
-	const connectWallet = async () => {
+	const connectWallet = useCallback(async () => {
 		try {
 			if (!ethereum) return alert("Please install MetaMask.");
 			const accounts = await ethereum.request({ method: "eth_requestAccounts", });
@@ -50,23 +51,45 @@ export const EthereumProvider = ({ children }) => {
 			console.log(error);
 			throw new Error("No ethereum object");
 		}
-	};
+	}, [])
 
 	//! Deploy ballot to blockchain
-	const deployBallot = async()=>{
+	const deployBallot = useCallback(async () => {
 		const contract = await deployBallotContract();
 		return await contract.getAddress()
-	}
+	}, [])
 
-	//! Deploy ballot to blockchain
-	const closeVotingPhase = async(addr)=>{
+
+	//! Close Voting Phase
+	const closeVotingPhase = useCallback(async (addr) => {
 		const contract = await getBallotContract(addr);
 		await contract.closeVotingPhase()
-	}
+	}, [])
 
-		useEffect(() => {
-			checkIfWalletIsConnect();
-		}, []);
+
+	//! GET MY VOTES
+	const getVoteFromBlockChain = useCallback(async (addr, UUID, candidates, publicKeyHex) => {
+		try {
+			const contract = await getBallotContract(addr);
+			const encVote = await contract.getEncryptedVote(UUID);
+			let retObj = {};
+			for (let i = 0; i < candidates.length(); i++) {
+				if (await verifyVote(candidates[i], publicKeyHex, encVote)) {
+					retObj[candidates[i]] = true;
+				} else {
+					retObj[candidates[i]] = false;
+				}
+			}
+			return retObj;
+		} catch (error) {
+			console.error(error);
+		}
+	}, [])
+
+
+	useEffect(() => {
+		checkIfWalletIsConnect().then()
+	}, []);
 
 	return (
 		<EthereumContext.Provider
@@ -74,7 +97,8 @@ export const EthereumProvider = ({ children }) => {
 				connectWallet,
 				currentAccount,
 				deployBallot,
-				closeVotingPhase
+				closeVotingPhase,
+				getVoteFromBlockChain
 			}}
 		>
 			{children}
