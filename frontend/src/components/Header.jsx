@@ -10,10 +10,11 @@ const Header = () => {
 
 	return (
 		<div className="p-2 flex justify-between shadow-lg">
-			<div className="flex flex-wrap items-center">
-				<a href="/">
+			<div className="flex flex-wrap items-center gap-2">
+				<a href="/main">
 					<img className="cursor-pointer" src={vp} alt="" width={47} height={40} />
 				</a>
+				<span className="font-bold text-red-600 text-xl">I vote</span>
 			</div>
 			<div className="flex gap-2">
 				{!currentAccount &&

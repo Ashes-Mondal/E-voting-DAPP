@@ -1,6 +1,7 @@
 import { useEffect, useState, useContext } from 'react'
 import vp from '../assets/images/vp.png'
-import vd from '../assets/images/vd.jpg'
+// import vd from '../assets/images/vd.jpg'
+import vd from '../assets/images/result.png'
 import { AuthContext } from '../../context/Auth'
 import { Navigate } from "react-router-dom";
 
@@ -107,11 +108,11 @@ export default function Login() {
 				<div className="bg-white w-full md:max-w-md lg:max-w-full md:mx-auto md:mx-0 md:w-1/2 xl:w-1/3 h-screen px-6 lg:px-16 xl:px-12 flex items-center justify-center">
 					<div className="w-full h-100">
 						<div className="flex flex-wrap items-center">
-							<a href="/">
+							<a href="/main">
 								<img className="cursor-pointer" src={vp} alt="" width={40} height={40} />
 							</a>
 						</div>
-						<a href="/" ><h1 className="text-xl font-bold cursor-pointer">E-Voting</h1></a>
+						<a href="/" ><h1 className="text-xl font-bold cursor-pointer">E-Voting :  <span className="font-bold text-red-600 text-xl">I vote</span></h1></a>
 						{isLogin ? <LoginForm setIsLogin={setIsLogin} /> : <SignupForm setIsLogin={setIsLogin} />}
 					</div>
 				</div>

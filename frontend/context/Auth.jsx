@@ -8,7 +8,7 @@ export const AuthContext = React.createContext();
 
 export const AuthProvider = ({ children }) => {
 	const [user, setUser] = useState(null);
-	const [userDataLoading,setUserDataLoading] = useState(true);
+	const [userDataLoading, setUserDataLoading] = useState(true);
 
 	//!Signup
 	const handleSignup = async (username, pwd, voterID) => {
@@ -16,6 +16,7 @@ export const AuthProvider = ({ children }) => {
 			const { publicKeyHex, privateKeyHex } = await genECCkeyPair();
 			const resp = await createAccount({ username, pwd, voterID, publicKey: publicKeyHex })
 			if (resp.data === "Success") {
+				alert("IMPORTANT:Do not lose this key file!")
 				await savePrivateKey(privateKeyHex, voterID, username);
 			}
 		} catch (error) {
@@ -39,7 +40,7 @@ export const AuthProvider = ({ children }) => {
 	}
 
 	//!Logout
-	const handleLogout = async ()=>{
+	const handleLogout = async () => {
 		try {
 			await logOutOfAccount();
 			setUser(null);
@@ -50,9 +51,11 @@ export const AuthProvider = ({ children }) => {
 
 	useEffect(() => {
 		getUserDetails().then(resp => {
-			setUserDataLoading(false)
 			setUser(resp.data)
-		}).catch(err=>console.warn(err))
+			setUserDataLoading(false)
+		})
+			.catch(err => console.warn(err))
+			.finally(setUserDataLoading(false))
 	}, [])
 
 	return (

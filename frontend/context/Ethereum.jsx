@@ -1,8 +1,9 @@
 import { abi, bytecode } from '../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json'
-import { ethers, ContractFactory } from "ethers";
+import { ethers, ContractFactory, } from "ethers";
 import React, { useEffect, useState } from "react";
 import { useCallback } from 'react';
 import { verifyVote } from '../cryptography/ECC';
+import { createNewPoll } from '../axios/election';
 
 export const EthereumContext = React.createContext();
 const { ethereum } = window;
@@ -48,15 +49,20 @@ export const EthereumProvider = ({ children }) => {
 			setCurrentAccount(accounts[0]);
 			window.location.reload();
 		} catch (error) {
-			console.log(error);
+			console.error(error);
 			throw new Error("No ethereum object");
 		}
 	}, [])
 
 	//! Deploy ballot to blockchain
 	const deployBallot = useCallback(async () => {
-		const contract = await deployBallotContract();
-		return await contract.getAddress()
+		try {
+			const contract = await deployBallotContract();
+			return await contract.getAddress
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
 	}, [])
 
 
@@ -83,9 +89,23 @@ export const EthereumProvider = ({ children }) => {
 			return retObj;
 		} catch (error) {
 			console.error(error);
+			throw error;
 		}
 	}, [])
 
+	//! Create a new poll
+	const createNewPollOnBlockchain = async (candidates,voterID,username) => {
+		try {
+			const addr = await deployBallot();
+			const resp = await createNewPoll({voterID,username,candidates,addr});
+			if(resp.data){
+				alert("Successfully created new poll");
+			}
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	}
 
 	useEffect(() => {
 		checkIfWalletIsConnect().then()
@@ -98,7 +118,8 @@ export const EthereumProvider = ({ children }) => {
 				currentAccount,
 				deployBallot,
 				closeVotingPhase,
-				getVoteFromBlockChain
+				getVoteFromBlockChain,
+				createNewPollOnBlockchain
 			}}
 		>
 			{children}

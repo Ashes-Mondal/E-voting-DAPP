@@ -22,7 +22,7 @@ router.post('/createPoll', async (req, res) => {
 		const poll = await electionModel.create({ hostPublicKey, hostVoterID: voterID, candidates, smartContractAddress });
 		await userModel.updateOne({ voterID, publicKey: hostPublicKey, username }, { $push: { pollsCreated: { pollID: poll._id } } });
 		await userModel.updateMany({}, { $push: { elections: { pollID: poll._id } } });
-		res.status(200).json(poll);
+		res.status(200).json({data:"Success",error:null});
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(500);
