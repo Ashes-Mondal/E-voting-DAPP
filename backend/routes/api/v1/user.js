@@ -3,7 +3,7 @@ const crypto = require("crypto");
 const { userModel } = require("../../../database/schemas");
 const router = express.Router();
 
-router.get('/getUserDetails', async (req, res) => {
+router.get('/details', async (req, res) => {
 	const { voterID, username } = req.body;
 	try {
 		const user = await userModel.findOne({ username, voterID }).populate({

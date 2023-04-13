@@ -1,4 +1,4 @@
-export const savePrivateKey = (privateKeyHEX) => {
+export const savePrivateKey = (privateKeyHEX,voterID,username) => {
 	try {
 		const link = document.createElement("a");
 		const blob = new Blob([privateKeyHEX], { type: "text/plain;charset=hex" });
@@ -6,7 +6,7 @@ export const savePrivateKey = (privateKeyHEX) => {
 		link.href = URL.createObjectURL(blob);
 
 		// Add file name
-		link.download = "EvotingPrivateKey.pem";
+		link.download = `${voterID}_${username}.pem`;
 
 		// Add click event to <a> tag to save file.
 		link.click();

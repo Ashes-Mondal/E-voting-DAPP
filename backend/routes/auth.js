@@ -34,11 +34,11 @@ router.post("/signup", async (req, res) => {
 });
 
 router.post("/login", async (req, res) => {
-	const { username, pwd } = req.body;
-	if (username && pwd) {
+	const { voterID, pwd } = req.body;
+	if (voterID && pwd) {
 		let user;
 		try {
-			user = await userModel.findOne({ username }).populate({
+			user = await userModel.findOne({ voterID }).populate({
 				path: "elections",
 				populate: {
 					path: "pollID",
