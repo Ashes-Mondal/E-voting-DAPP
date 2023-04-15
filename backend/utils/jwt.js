@@ -3,7 +3,7 @@ const jwt = require("jsonwebtoken");
 
 // function will create access token
 module.exports.createAccessToken = async ( username, voterID ) => {
-	const accessToken = jwt.sign({username,voterID}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: "300s" });
+	const accessToken = jwt.sign({username,voterID}, process.env.ACCESS_TOKEN_SECRET,{ expiresIn: "600s" });
 	return accessToken;
 };
 

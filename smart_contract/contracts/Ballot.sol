@@ -8,8 +8,16 @@ contract Ballot is Ownable {
     mapping(string => bool) voters;
     mapping(string => string) votes;
     bool public votingPhase = true;
+    address serverAccountAddr;
 
-    constructor() Ownable(msg.sender) {}
+    modifier onlyServer() {
+        require(msg.sender == serverAccountAddr, "Access Denied");
+        _;
+    }
+
+    constructor(address _own) Ownable(_own) {
+        serverAccountAddr = msg.sender;
+    }
 
     function checkVoteStatus(string memory _UUID) external view returns (bool) {
         return voters[_UUID];
@@ -28,14 +36,14 @@ contract Ballot is Ownable {
     function getEncryptedVote(
         string memory _UUID
     ) external view returns (string memory) {
-		require(voters[_UUID] == true, "Not voted!");
+        require(voters[_UUID] == true, "Not voted!");
         return votes[_UUID];
     }
 
     function addVote(
         string memory _UUID,
         string memory _encryptedVote
-    ) external {
+    ) external onlyServer {
         require(votingPhase == true, "Voting Phase closed!");
         if (voters[_UUID] == false) {
             encryptedVotes.push(_encryptedVote);
@@ -46,5 +54,9 @@ contract Ballot is Ownable {
 
     function closeVotingPhase() public onlyOwner {
         votingPhase = false;
+    }
+
+    function isVotingPhase() external view returns(bool){
+        return votingPhase;
     }
 }

@@ -1,7 +1,7 @@
 import { useEffect, useState, useContext } from 'react'
 import vp from '../assets/images/vp.png'
-// import vd from '../assets/images/vd.jpg'
 import vd from '../assets/images/result.png'
+import lw from '../assets/images/lw.jpg'
 import { AuthContext } from '../../context/Auth'
 import { Navigate } from "react-router-dom";
 
@@ -101,7 +101,7 @@ export default function Login() {
 			<section className="flex flex-col md:flex-row h-screen items-center">
 				<div className="bg-white-600 hidden md:block w-full md:w-1/2 xl:w-2/3 h-screen flex justify-center justify-items-center">
 					<img
-						src={isLogin ? vd : 'https://free4kwallpapers.com/uploads/originals/2021/03/12/low-poly-planet-wallpaper.jpg'}
+						src={isLogin ? vd : lw}
 						//  src='https://free4kwallpapers.com/uploads/originals/2021/03/12/low-poly-planet-wallpaper.jpg' 
 						alt="" className={` w-full h-full  ${isLogin ? 'object-contain' : 'object-cover'}`} />
 				</div>

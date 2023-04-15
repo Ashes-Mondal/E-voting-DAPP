@@ -48,7 +48,3 @@ export const decryptVote = async (encryptedVoteStringified, privateKeyHEX) => {
 	const decryptedBuffer = await eccryptoJS.decrypt(privateKeyBuffer, encryptedVoteObject);
 	return decryptedBuffer.toString();
 }
-
-export const verifyVote = async(voteUTF8,publicKeyHEX,encVoteStr)=>{
-	return encVoteStr === encryptVote(voteUTF8,publicKeyHEX);
-}

@@ -11,7 +11,7 @@ export default function CreatePoll() {
 	const [candidates, setCandidates] = useState([]);
 	const handleOnSubmit = () => {
 		if(currentAccount && candidates.length)
-			createNewPollOnBlockchain(candidates, user.voterID, user.username).then(_=>setCandidates([]))
+			createNewPollOnBlockchain(candidates).then(_=>setCandidates([]))
 		else if(candidates.length == 0){
 			alert("Fill some candidates")
 		}

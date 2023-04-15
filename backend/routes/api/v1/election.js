@@ -12,17 +12,20 @@ const { userModel, electionModel } = require("../../../database/schemas");
 const { abi, bytecode } = require('../../../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json')
 const ethers = require('ethers');
 const bcrypt = require('bcrypt');
+const { deployNewBallot } = require("../../../utils/blockchain");
 
 
 router.post('/createPoll', async (req, res) => {
-	const { voterID, username, candidates, smartContractAddress } = req.body;
-	const doc = await userModel.findOne({ voterID, username });
-	const hostPublicKey = doc.publicKey;
+	const { voterID, username, candidates, currentAccount } = req.body;
 	try {
+		const smartContractAddress = await deployNewBallot(currentAccount);
+		const doc = await userModel.findOne({ voterID, username });
+		const hostPublicKey = doc.publicKey;
+
 		const poll = await electionModel.create({ hostPublicKey, hostVoterID: voterID, candidates, smartContractAddress });
 		await userModel.updateOne({ voterID, publicKey: hostPublicKey, username }, { $push: { pollsCreated: { pollID: poll._id } } });
 		await userModel.updateMany({}, { $push: { elections: { pollID: poll._id } } });
-		res.status(200).json({data:"Success",error:null});
+		res.status(200).json({ data: "Success", error: null });
 	} catch (error) {
 		console.error(error);
 		res.sendStatus(500);
@@ -59,7 +62,7 @@ router.get('/giveUniqueID/:pollID', async (req, res) => {
 })
 
 router.post('/castVote', async (req, res) => {
-	const { voterID, username, pollID, encryptedVote, UUID } = req.body;
+	const { voterID, username, pollID, encryptedVote, UUID, encryptedVote_user } = req.body;
 	const doc = await electionModel.findOne({ _id: pollID });
 	if (!doc) {
 		res.status(404).send("No such election exsits!")
@@ -85,9 +88,13 @@ router.post('/castVote', async (req, res) => {
 			return;
 		}
 		await BallotContract.addVote(UUID, encryptedVote);
-		await userModel.updateOne({ voterID, username, 'elections.pollID': pollID }, { "elections.$.encryptedVote": encryptedVote });
+		await userModel.updateOne({ voterID, username, 'elections.pollID': pollID }, { "elections.$.encryptedVote": encryptedVote_user });
 		res.status(200).json({ data: "SUCCESS", error: null });
 	} catch (error) {
+		if(error.message.includes("Voting Phase closed!")){
+			res.status(200).json({ error: "Voting Phase closed!", data: null });
+			return
+		}
 		console.error(error);
 		res.sendStatus(500);
 		res.end();

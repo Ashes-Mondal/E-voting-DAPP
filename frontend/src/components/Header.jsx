@@ -14,7 +14,9 @@ const Header = () => {
 				<a href="/main">
 					<img className="cursor-pointer" src={vp} alt="" width={47} height={40} />
 				</a>
-				<span className="font-bold text-red-600 text-xl">I vote</span>
+				<a href="/main">
+					<span className="font-bold text-red-600 text-xl">I vote</span>
+				</a>
 			</div>
 			<div className="flex gap-2">
 				{!currentAccount &&
@@ -39,4 +41,3 @@ const Header = () => {
 
 };
 export default Header;
-//text-white bg-blue-700 hover:bg-blue-800 focus:outline-none focus:ring-4 focus:ring-blue-300 font-medium rounded-full text-sm px-5 py-2.5 text-center mt-2 mx-2 dark:bg-blue-600 dark:hover:bg-blue-700 dark:focus:ring-blue-800

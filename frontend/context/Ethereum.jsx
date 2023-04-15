@@ -2,9 +2,8 @@ import { abi, bytecode } from '../../smart_contract/artifacts/contracts/Ballot.s
 import { ethers, ContractFactory, } from "ethers";
 import React, { useEffect, useState } from "react";
 import { useCallback } from 'react';
-import { verifyVote } from '../cryptography/ECC';
+import { decryptVote } from '../cryptography/ECC';
 import { createNewPoll } from '../axios/election';
-
 export const EthereumContext = React.createContext();
 const { ethereum } = window;
 
@@ -69,24 +68,33 @@ export const EthereumProvider = ({ children }) => {
 	//! Close Voting Phase
 	const closeVotingPhase = useCallback(async (addr) => {
 		const contract = await getBallotContract(addr);
-		await contract.closeVotingPhase()
+		const res = await contract.isVotingPhase()
+		if(res)
+			await contract.closeVotingPhase()
+		else
+			alert("Already closed!")
 	}, [])
 
 
 	//! GET MY VOTES
-	const getVoteFromBlockChain = useCallback(async (addr, UUID, candidates, publicKeyHex) => {
+	const getEncVoteFromBlockChain = useCallback(async (addr, encryptedUID,userPrivateKey) => {
 		try {
+			const UUID = await decryptVote(encryptedUID,userPrivateKey)
 			const contract = await getBallotContract(addr);
 			const encVote = await contract.getEncryptedVote(UUID);
-			let retObj = {};
-			for (let i = 0; i < candidates.length(); i++) {
-				if (await verifyVote(candidates[i], publicKeyHex, encVote)) {
-					retObj[candidates[i]] = true;
-				} else {
-					retObj[candidates[i]] = false;
-				}
-			}
-			return retObj;
+			return encVote;
+		} catch (error) {
+			console.error(error);
+			throw error;
+		}
+	}, [])
+
+	//! GET ALL VOTES
+	const getAllEncVoteFromBlockChain = useCallback(async (addr) => {
+		try {
+			const contract = await getBallotContract(addr);
+			const allEncVotes = await contract.getAllEncryptedVotes();
+			return allEncVotes;
 		} catch (error) {
 			console.error(error);
 			throw error;
@@ -94,10 +102,10 @@ export const EthereumProvider = ({ children }) => {
 	}, [])
 
 	//! Create a new poll
-	const createNewPollOnBlockchain = async (candidates,voterID,username) => {
+	const createNewPollOnBlockchain = async (candidates) => {
 		try {
-			const addr = await deployBallot();
-			const resp = await createNewPoll({voterID,username,candidates,addr});
+			// const addr = await deployBallot();
+			const resp = await createNewPoll({candidates,currentAccount});
 			if(resp.data){
 				alert("Successfully created new poll");
 			}
@@ -118,8 +126,9 @@ export const EthereumProvider = ({ children }) => {
 				currentAccount,
 				deployBallot,
 				closeVotingPhase,
-				getVoteFromBlockChain,
-				createNewPollOnBlockchain
+				getEncVoteFromBlockChain,
+				createNewPollOnBlockchain,
+				getAllEncVoteFromBlockChain
 			}}
 		>
 			{children}

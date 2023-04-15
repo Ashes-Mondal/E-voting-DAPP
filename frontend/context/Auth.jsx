@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { genECCkeyPair } from "../cryptography/ECC";
 import { createAccount, logIntoAccount, logOutOfAccount } from "../axios/auth";
-import { savePrivateKey } from "../cryptography/file";
+import { saveFile } from "../cryptography/file";
 import { getUserDetails } from "../axios/user";
 
 export const AuthContext = React.createContext();
@@ -17,7 +17,9 @@ export const AuthProvider = ({ children }) => {
 			const resp = await createAccount({ username, pwd, voterID, publicKey: publicKeyHex })
 			if (resp.data === "Success") {
 				alert("IMPORTANT:Do not lose this key file!")
-				await savePrivateKey(privateKeyHex, voterID, username);
+				const fileName= `${voterID}_${username}.pem`;
+				await saveFile(privateKeyHex, fileName);
+				window.location.reload();
 			}
 		} catch (error) {
 			console.error(error)
@@ -30,13 +32,13 @@ export const AuthProvider = ({ children }) => {
 		try {
 			const user = await logIntoAccount({ pwd, voterID })
 			if (user && !user.error) {
-				setUserDataLoading(false)
 				setUser(user.data)
 			}
 		} catch (error) {
 			console.error(error)
 			throw error;
 		}
+
 	}
 
 	//!Logout
@@ -52,11 +54,17 @@ export const AuthProvider = ({ children }) => {
 	useEffect(() => {
 		getUserDetails().then(resp => {
 			setUser(resp.data)
-			setUserDataLoading(false)
 		})
-			.catch(err => console.warn(err))
-			.finally(setUserDataLoading(false))
+			.catch(err => {
+				console.warn(err)
+				setUserDataLoading(false);
+			})
 	}, [])
+
+	useEffect(() => {
+		if(user)
+			setUserDataLoading(false);
+	}, [user])
 
 	return (
 		<AuthContext.Provider
