@@ -1,5 +1,5 @@
 const ethers = require('ethers');
-const {abi,bytecode} = require('../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json')
+const {abi,bytecode} = require('./Ballot.json')
 
 module.exports.deployNewBallot = async(ownerAccountAddr) => {
 	let provider = ethers.getDefaultProvider(process.env.JSON_RPC_PROVIDER);

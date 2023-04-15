@@ -1,4 +1,4 @@
-import { abi, bytecode } from '../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json'
+import { abi, bytecode } from './Ballot.json'
 import { ethers, ContractFactory, } from "ethers";
 import React, { useEffect, useState } from "react";
 import { useCallback } from 'react';

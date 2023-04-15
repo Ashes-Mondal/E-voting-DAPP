@@ -9,7 +9,7 @@ const logger = winston.createLogger({
 });
 const { encryptEC } = require("../../../utils/encryption-decryption");
 const { userModel, electionModel } = require("../../../database/schemas");
-const { abi, bytecode } = require('../../../../smart_contract/artifacts/contracts/Ballot.sol/Ballot.json')
+const { abi, bytecode } = require('../../../utils/Ballot.json')
 const ethers = require('ethers');
 const bcrypt = require('bcrypt');
 const { deployNewBallot } = require("../../../utils/blockchain");
